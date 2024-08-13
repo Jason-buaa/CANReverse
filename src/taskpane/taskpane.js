@@ -26,15 +26,20 @@ export async function run() {
     let headerValues2 = headerRange.values[0];
     console.log(headerValues);
     console.log(headerValues2);
+    console.log(headerValues2.length);
     //You can iterate through headers and perform operations on specific columns based on their names:
     headerValues2.forEach(async (header, index) => {
       if (header === "ID") {
           // Perform operations on the "ID" column
-          let idColumnRange = traceTable.getDataBodyRange().getColumn(index).load("values");
+          let idColumnRange = traceTable.getDataBodyRange().getColumn(index).load("values,rowIndex,rowCount");
           await context.sync();
-          
-          let count = idColumnRange.values.flat().filter(value => value === 64).length;
+          let id64RowValues = idColumnRange.values.flat().filter(el => el === 64);
+          let startRowIndex=idColumnRange.rowIndex;
+          let endRowIndex=idColumnRange.rowCount + startRowIndex -1;
+          let count = id64RowValues.length;
           console.log(`Count of rows with ID=64: ${count}`);
+          console.log(`Value Array of rows with ID=64: ${id64RowValues}`);
+          console.log(`All row index: ${startRowIndex} to ${endRowIndex}`);
       }
   });
     });
