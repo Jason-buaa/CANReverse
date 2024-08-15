@@ -32,14 +32,20 @@ export async function run() {
       if (header === "ID") {
           // Perform operations on the "ID" column
           let idColumnRange = traceTable.getDataBodyRange().getColumn(index).load("values,rowIndex,rowCount");
+          let timestampColumnRange = traceTable.getDataBodyRange().getColumn(index-2).load("values,rowIndex,rowCount");
+          let byte0ColumnRange = traceTable.getDataBodyRange().getColumn(index+4).load("values,rowIndex,rowCount");
           await context.sync();
-          let id64RowValues = idColumnRange.values.flat().filter(el => el === 64);
-          let startRowIndex=idColumnRange.rowIndex;
-          let endRowIndex=idColumnRange.rowCount + startRowIndex -1;
-          let count = id64RowValues.length;
-          console.log(`Count of rows with ID=64: ${count}`);
-          console.log(`Value Array of rows with ID=64: ${id64RowValues}`);
-          console.log(`All row index: ${startRowIndex} to ${endRowIndex}`);
+          let idValues =idColumnRange.values.flat();
+          let id64RowIndices = idValues
+          .map((el, idx) => el === 64 ? idx : -1) // +2 to adjust for Excel row numbers (assuming table starts at row 1)
+          .filter(index => index !== -1); // Filter out the -1 values
+          let id64Timestamps= id64RowIndices.map(idx => timestampColumnRange.values[idx]);
+          let id64Bytes0=id64RowIndices.map(idx=>byte0ColumnRange.values[idx]).map(hexStr=>parseInt(hexStr,16));
+      let count = id64RowIndices.length;
+      console.log(`Count of rows with ID=64: ${count}`);
+      console.log(`Row indices with ID=64: ${id64RowIndices}`);
+      console.log(`Row indices with ID=64: ${id64Timestamps}`);
+      console.log(`Row indices with ID=64: ${id64Bytes0}`);
       }
   });
     });
