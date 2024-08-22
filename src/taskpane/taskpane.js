@@ -61,6 +61,27 @@ export async function run() {
       //console.log(`Row indices with ID=64: ${id64RowIndices}`);
       //console.log(`Row indices with ID=64: ${id64Timestamps}`);
       console.log(`Row indices with ID=64: ${combinedArray}`);
+      const sheet0x64 = context.workbook.worksheets.getItem("0x64Trace");
+          // Calculate the range based on the length of the array
+       const numberOfRows = combinedArray.length;
+       console.log(`Row indices with ID=64: ${numberOfRows}`);
+       const startCell = "A2"; // Starting from cell A1
+       const endCell = `A${numberOfRows+1}`; // Calculate the ending cell based on the array length
+       const rangeAddress = `${startCell}:${endCell}`; // Define the range address
+
+    // Select the range where you want to fill the array
+        const range0x64 = sheet0x64.getRange(rangeAddress);
+     let stringArray= combinedArray.map(num => [num.toString()]);
+    // Set the values of the range with the stringArray
+    range0x64.numberFormat = '@'; // '@' sets the format to Text
+        range0x64.values = stringArray;
+    
+    // Load the range properties and sync
+    range0x64.load("values");
+       await context.sync();
+
+      console.log("Array filled successfully!");
+
       }
   });
     });
